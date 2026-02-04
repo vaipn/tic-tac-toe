@@ -3,7 +3,30 @@ using UnityEngine.UI;
 
 public class UICellBehavior : MonoBehaviour
 {
-	[SerializeField] private Cell cell;
+	private Cell cell;
+	
+	public void Setup(Cell newCell)
+	{
+		cell = newCell;
+		// Re-subscribe if we are recycling this UI object, but typically we instantiate fresh ones or clean them up.
+		// For simplicity assuming fresh instantiation or properly handled lifecycle.
+		// Actually, we need to bind events here if OnEnable was called before Setup.
+		// But in this flow, Start/OnEnable might run before Setup.
+		
+		// Let's safe guard.
+		if (isActiveAndEnabled)
+		{
+			// Unsubscribe from potential old one
+			// (If pooling, this is important. If just instantiating, not so much)
+			// Since we don't have the old reference easily unless we check null...
+			
+			cell.OnValueChanged += OnValueChanged;
+			cell.OnGameFinished += OnGameFinished;
+            
+            // Sync initial state
+            OnValueChanged(cell.id, cell.value);
+		}
+	}
 	[SerializeField] private Button button;
 	[SerializeField] private Image image;
 	[SerializeField] private Color defaultColor;
@@ -25,13 +48,19 @@ public class UICellBehavior : MonoBehaviour
 	}
 	private void OnEnable()
 	{
-		cell.OnValueChanged += OnValueChanged;
-		cell.OnGameFinished += OnGameFinished;
+		if (cell != null)
+		{
+			cell.OnValueChanged += OnValueChanged;
+			cell.OnGameFinished += OnGameFinished;
+		}
 	}
 	private void OnDisable()
 	{
-		cell.OnValueChanged -= OnValueChanged;
-		cell.OnGameFinished -= OnGameFinished;
+		if (cell != null)
+		{
+			cell.OnValueChanged -= OnValueChanged;
+			cell.OnGameFinished -= OnGameFinished;
+		}
 	}
 	private void OnValueChanged(int cell, int newValue)
 	{
@@ -47,6 +76,7 @@ public class UICellBehavior : MonoBehaviour
 	}
 	private void OnButtonClick()
 	{
+        if (cell == null) return;
 		if (!cell.IsInteractive) return;
 		if (cell.value == 0) // Only change if blank
 		{
