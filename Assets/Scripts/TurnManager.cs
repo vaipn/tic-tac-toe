@@ -2,22 +2,29 @@ using UnityEngine;
 
 public class TurnManager : PersistentMonoSingleton<TurnManager>
 {
+    public event System.Action<bool> OnTurnChanged; // true = X, false = O
 	private bool xUserTurn;
+
+    public bool IsXTurn => xUserTurn;
 
 	private void Start()
 	{
-		xUserTurn = true; // X player starts first
+		ResetTurn();
 	}
 
-	public bool GetTurn()
+    public void ResetTurn()
+    {
+        xUserTurn = true;
+        OnTurnChanged?.Invoke(xUserTurn);
+    }
+
+	public void SwitchTurn()
 	{
-		bool turn = xUserTurn;
-		xUserTurn = !xUserTurn; // Switch turns between X and O
-		return turn;
+		xUserTurn = !xUserTurn;
+        OnTurnChanged?.Invoke(xUserTurn);
 	}
 
 	protected override void Initialize()
 	{
-		// additional initialization can be placed here
 	}
 }

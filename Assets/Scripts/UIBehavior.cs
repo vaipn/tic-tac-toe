@@ -5,11 +5,13 @@ using UnityEngine.UI;
 public class UIBehavior : MonoBehaviour
 {
 	[SerializeField] private TextMeshProUGUI gameStatusText;
+    [SerializeField] private TextMeshProUGUI turnIndicatorText; // Add this
 	[SerializeField] private Button restartButton;
 	[SerializeField] private GameObject gameEndPanel;
     
     [Header("Difficulty Selection")]
     [SerializeField] private GameObject difficultyPanel;
+    [SerializeField] private Toggle aiModeToggle; // CHECK THIS IN INSPECTOR
     [SerializeField] private Button easyButton;
     [SerializeField] private Button mediumButton;
     [SerializeField] private Button hardButton;
@@ -19,18 +21,26 @@ public class UIBehavior : MonoBehaviour
     [SerializeField] private UICellBehavior cellPrefab;
 
     private Difficulty currentDifficulty = Difficulty.Easy;
+    private GameMode currentMode = GameMode.PvP;
 
 	private void OnEnable()
 	{
 		BoardManager.Instance.OnGameFinished += HandleGameFinished;
 		BoardManager.Instance.OnReset += ResetUI;
         BoardManager.Instance.OnBoardSetup += GenerateGrid;
+        
+        // Listen to Turn Changes for UI Feedback
+        if (TurnManager.Instance != null)
+             TurnManager.Instance.OnTurnChanged += UpdateTurnText;
 	}
 	private void OnDisable()
 	{
 		BoardManager.Instance.OnGameFinished -= HandleGameFinished;
 		BoardManager.Instance.OnReset -= ResetUI;
         BoardManager.Instance.OnBoardSetup -= GenerateGrid;
+
+        if (TurnManager.Instance != null)
+             TurnManager.Instance.OnTurnChanged -= UpdateTurnText;
 	}
 	private void Start()
 	{
@@ -43,13 +53,28 @@ public class UIBehavior : MonoBehaviour
         // Show difficulty panel first
         difficultyPanel.SetActive(true);
         gameEndPanel.SetActive(false);
+        if(turnIndicatorText) turnIndicatorText.text = ""; // Hide initially
 	}
+
+    private void UpdateTurnText(bool isXTurn)
+    {
+        if (difficultyPanel.activeSelf || gameEndPanel.activeSelf) 
+        {
+            if (turnIndicatorText) turnIndicatorText.text = "";
+            return;
+        }
+
+        if (turnIndicatorText) 
+            turnIndicatorText.text = isXTurn ? "Player X Turn" : "Player O Turn";
+    }
 
     private void StartGame(Difficulty difficulty)
     {
         currentDifficulty = difficulty;
+        currentMode = aiModeToggle.isOn ? GameMode.PvE : GameMode.PvP;
+        
         difficultyPanel.SetActive(false);
-        BoardManager.Instance.InitializeGame(difficulty);
+        BoardManager.Instance.InitializeGame(difficulty, currentMode);
     }
 
     private void GenerateGrid(int gridSize, System.Collections.Generic.List<Cell> cells)
@@ -98,6 +123,6 @@ public class UIBehavior : MonoBehaviour
 	}
 	private void RestartGame()
 	{
-		BoardManager.Instance.InitializeGame(currentDifficulty);
+		BoardManager.Instance.InitializeGame(currentDifficulty, currentMode);
 	}
 }

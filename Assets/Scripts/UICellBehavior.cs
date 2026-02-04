@@ -80,9 +80,10 @@ public class UICellBehavior : MonoBehaviour
 		if (!cell.IsInteractive) return;
 		if (cell.value == 0) // Only change if blank
 		{
-			bool isXTurn = TurnManager.Instance.GetTurn();
+			bool isXTurn = TurnManager.Instance.IsXTurn;
 			int newValue = isXTurn ? 1 : 2;
 			cell.SetValue(newValue);
+            TurnManager.Instance.SwitchTurn();
 		}
 	}
 }

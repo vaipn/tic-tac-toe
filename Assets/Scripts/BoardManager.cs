@@ -9,25 +9,40 @@ public enum Difficulty
     Hard = 5
 }
 
+public enum GameMode
+{
+    PvP,
+    PvE
+}
+
 public class BoardManager : PersistentMonoSingleton<BoardManager>
 {
     public event Action<int, bool> OnGameFinished;
     public event Action OnReset;
-    public event Action<int, List<Cell>> OnBoardSetup; // GridSize, List of Cells
+    public event Action<int, List<Cell>> OnBoardSetup; 
 
     private List<Cell> cellsList = new();
     private int currentGridSize;
+    private GameMode currentMode;
+    private bool isGameActive;
 
     private void Start()
     {
-        // Don't auto-start. Wait for UI selection. 
-        // Or default to Easy for testing if needed, but let's wait for UI.
+        TurnManager.Instance.OnTurnChanged += HandleTurnChanged;
+    }
+    
+    private void OnDisable()
+    {
+        if(TurnManager.Instance != null)
+             TurnManager.Instance.OnTurnChanged -= HandleTurnChanged;
     }
 
-    public void InitializeGame(Difficulty difficulty)
+    public void InitializeGame(Difficulty difficulty, GameMode mode)
     {
         ClearBoard();
         currentGridSize = (int)difficulty;
+        currentMode = mode;
+        isGameActive = true;
 
         for (int i = 0; i < currentGridSize * currentGridSize; i++)
         {
@@ -41,14 +56,44 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
         ResetGame();
     }
 
+    private void HandleTurnChanged(bool isXTurn)
+    {
+        if (!isGameActive) return;
+        
+        // If PvE and it's O's turn (False), triggers AI
+        if (currentMode == GameMode.PvE && !isXTurn)
+        {
+            StartCoroutine(PerformAIMove());
+        }
+    }
+
+    private System.Collections.IEnumerator PerformAIMove()
+    {
+        // Small delay for UX
+        yield return new WaitForSeconds(0.5f);
+        
+        if (!isGameActive) yield break;
+
+        // Simple Random AI
+        var emptyCells = new List<Cell>();
+        foreach(var c in cellsList)
+        {
+            if (c.value == 0) emptyCells.Add(c);
+        }
+
+        if (emptyCells.Count > 0)
+        {
+            var target = emptyCells[UnityEngine.Random.Range(0, emptyCells.Count)];
+            target.SetValue(2); // AI is always O
+            TurnManager.Instance.SwitchTurn();
+        }
+    }
+
     private void ClearBoard()
     {
         foreach (var cell in cellsList)
         {
             cell.OnValueChanged -= CheckWinCondition;
-            // ScriptableObjects created at runtime should ideally be destroyed if not needed, 
-            // but for this simple scope letting GC handle it or just overwriting the list reference is okay.
-            // Ideally: Destroy(cell); if it was a MonoBehaviour, but it's SO.
         }
         cellsList.Clear();
     }
@@ -57,12 +102,12 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
     {
         if (CheckWin(value))
         {
-            // highlighting is handled in CheckLine
-            
+            isGameActive = false;
             OnGameFinished?.Invoke(value, true);
         }
         else if (IsDraw())
         {
+            isGameActive = false;
             foreach (var cell in cellsList) cell.SetResult(false);
             OnGameFinished?.Invoke(0, false);
         }
@@ -102,11 +147,11 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
             winningCells.Add(cellsList[index]);
         }
 
-        // If we get here, we found a win line. Highlight them.
-        foreach(var c in winningCells) c.SetResult(true);
-        
-        // Disable the rest
-        foreach (var c in cellsList)
+		// If we get here, we found a win line. Highlight them.
+		foreach (var c in winningCells) c.SetResult(true);
+
+		// Disable the rest
+		foreach (var c in cellsList)
         {
             if (!winningCells.Contains(c)) c.SetResult(false);
         }
@@ -125,6 +170,8 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
 
     public void ResetGame()
     {
+        isGameActive = true;
+        TurnManager.Instance.ResetTurn();
         foreach (var cell in cellsList) cell.Reset();
         OnReset?.Invoke();
     }
