@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6305260513010514096}
   - component: {fileID: 7401106541252684069}
   - component: {fileID: 1240329204257750584}
+  - component: {fileID: 4650639064676751237}
   m_Layer: 5
   m_Name: Cell Button
   m_TagString: Untagged
@@ -66,7 +67,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -319469171194908686, guid: 4f4b046e6b62e0d4a9c9eb5463a79a4b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4f4b046e6b62e0d4a9c9eb5463a79a4b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -120,3 +121,21 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4650639064676751237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4137876377144013780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 487a4b49be2909c4c924ead9d106ed75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cell: {fileID: 11400000, guid: 27562255e51924c42b41c7da51ca5a1d, type: 2}
+  button: {fileID: 1240329204257750584}
+  image: {fileID: 7401106541252684069}
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  winColor: {r: 0.2901961, g: 0.7411765, b: 0.16078432, a: 1}
+  failedColor: {r: 0.6150943, g: 0.09632604, b: 0.09632604, a: 1}
