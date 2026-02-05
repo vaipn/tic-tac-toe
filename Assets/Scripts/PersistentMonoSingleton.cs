@@ -12,7 +12,7 @@ public abstract class PersistentMonoSingleton<T> : MonoBehaviour where T : Compo
         {
             if (_applicationIsQuitting)
             {
-                Debug.LogWarning($"[MonoBehaviourSingletonPersistent] Instance '{typeof(T)}' already destroyed. Returning null.");
+                Debug.Log($"[MonoBehaviourSingletonPersistent] Instance '{typeof(T)}' already destroyed. Returning null.");
                 return null;
             }
 

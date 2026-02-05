@@ -35,9 +35,12 @@ public class UIBehavior : MonoBehaviour
 	}
 	private void OnDisable()
 	{
-		BoardManager.Instance.OnGameFinished -= HandleGameFinished;
-		BoardManager.Instance.OnReset -= ResetUI;
-        BoardManager.Instance.OnBoardSetup -= GenerateGrid;
+        if (BoardManager.Instance != null)
+        {
+			BoardManager.Instance.OnGameFinished -= HandleGameFinished;
+			BoardManager.Instance.OnReset -= ResetUI;
+			BoardManager.Instance.OnBoardSetup -= GenerateGrid;
+		}
 
         if (TurnManager.Instance != null)
              TurnManager.Instance.OnTurnChanged -= UpdateTurnText;
