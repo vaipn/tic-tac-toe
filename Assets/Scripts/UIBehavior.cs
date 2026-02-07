@@ -7,7 +7,6 @@ public class UIBehavior : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI gameStatusText;
     [SerializeField] private TextMeshProUGUI turnIndicatorText;
 	[SerializeField] private Button restartButton;
-    [SerializeField] private Button backButton;
 	[SerializeField] private GameObject gameEndPanel;
     [SerializeField] private TextMeshProUGUI gameDescriptionText;
     [SerializeField] private Image sliderFillImage;
@@ -20,10 +19,15 @@ public class UIBehavior : MonoBehaviour
     [SerializeField] private Sprite hardIcon;
     [SerializeField] private Image gameScreenBgImage;
     [SerializeField] private TMP_Text gameScreenDifficultyText;
-    [SerializeField] private TMP_Text gameScreenYourScoreText;
-    [SerializeField] private TMP_Text gameScreenBotScoreText;
+    [SerializeField] private TMP_Text gameScreenYourScoreText; // pve
+    [SerializeField] private TMP_Text gameScreenBotScoreText; // pve
+    [SerializeField] private TMP_Text gameScreenXScoreText; // pvp
+    [SerializeField] private TMP_Text gameScreenOScoreText; // pvp
     [SerializeField] private Animator yourTurnAnimator;
+    [SerializeField] private Animator oTurnAnimator;
     [SerializeField] private Animator botTurnAnimator;
+    [SerializeField] private GameObject topContainer; // pve
+    [SerializeField] private GameObject middleContainer; // pvp
     
     [Header("Difficulty Selection")]
     [SerializeField] private GameObject difficultyPanel;
@@ -69,7 +73,6 @@ public class UIBehavior : MonoBehaviour
 	}
 	private void Start()
 	{
-        backButton.onClick.AddListener(GoToDifficultyPanel);
 		restartButton.onClick.AddListener(RestartGame);
         
         playPvPButton.onClick.AddListener(()=> StartGame(GameMode.PvP));
@@ -153,15 +156,32 @@ public class UIBehavior : MonoBehaviour
         {
             botTurnAnimator.SetTrigger("Play Popup");
         }
+		else
+		{
+            oTurnAnimator.SetTrigger("Play Popup");
+		}
 
-    }
+	}
 
     private void StartGame(GameMode mode)
     {
         currentMode = mode;
         
         difficultyPanel.SetActive(false);
+
+        if (currentMode == GameMode.PvE)
+        {
+            topContainer.SetActive(true);
+            middleContainer.SetActive(false);
+        }
+        else if (currentMode == GameMode.PvP)
+        {
+            middleContainer.SetActive(true);
+            topContainer.SetActive(false);
+        }
+
         BoardManager.Instance.InitializeGame(currentDifficulty, currentMode);
+      
     }
 
     private void GenerateGrid(int gridSize, System.Collections.Generic.List<Cell> cells)
@@ -197,11 +217,13 @@ public class UIBehavior : MonoBehaviour
             if (value == 1)
             {
                 gameScreenYourScoreText.text = "1";
+                gameScreenXScoreText.text = "1";
             }
             else
             {
                 gameScreenBotScoreText.text = "1";
-            }
+				gameScreenOScoreText.text = "1";
+			}
 		}
 		else
 		{
@@ -215,13 +237,15 @@ public class UIBehavior : MonoBehaviour
 		gameEndPanel.SetActive(false);
         gameScreenYourScoreText.text = "0";
         gameScreenBotScoreText.text = "0";
+		gameScreenXScoreText.text = "0";
+        gameScreenOScoreText.text = "0";
 
-        TurnManager.Instance.ResetTurn();
+		TurnManager.Instance.ResetTurn();
         // We stay in game unless we want to go back to difficulty menu?
         // Logic says "ResetGame" usually just restarts current match.
 	}
 
-    private void GoToDifficultyPanel()
+    public void GoToDifficultyPanel()
     {
         difficultyPanel.SetActive(true);
     }
