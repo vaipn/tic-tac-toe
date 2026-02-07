@@ -5,22 +5,35 @@ using UnityEngine.UI;
 public class UIBehavior : MonoBehaviour
 {
 	[SerializeField] private TextMeshProUGUI gameStatusText;
-    [SerializeField] private TextMeshProUGUI turnIndicatorText; // Add this
+    [SerializeField] private TextMeshProUGUI turnIndicatorText;
 	[SerializeField] private Button restartButton;
 	[SerializeField] private GameObject gameEndPanel;
+    [SerializeField] private TextMeshProUGUI gameDescriptionText;
+    [SerializeField] private Image sliderFillImage;
+    [SerializeField] private Image pveButtonImage;
+    [SerializeField] private Image sliderHandleImage;
+    [SerializeField] private Image smileyIcon;
+    [SerializeField] private RectTransform smileyIconRectTransform;
+    [SerializeField] private Sprite easyIcon;
+    [SerializeField] private Sprite mediumIcon;
+    [SerializeField] private Sprite hardIcon;
     
     [Header("Difficulty Selection")]
     [SerializeField] private GameObject difficultyPanel;
-    [SerializeField] private Toggle aiModeToggle; // CHECK THIS IN INSPECTOR
-    [SerializeField] private Button easyButton;
-    [SerializeField] private Button mediumButton;
-    [SerializeField] private Button hardButton;
+    [SerializeField] private Slider difficultySlider; 
+    [SerializeField] private TextMeshProUGUI difficultyText;
+    [SerializeField] private Color difficultyColor;
+	[SerializeField] private Color easyColor;
+	[SerializeField] private Color mediumColor;
+	[SerializeField] private Color hardColor;
+	[SerializeField] private Button playPvPButton;
+    [SerializeField] private Button playPvEButton;
 
     [Header("Grid Generation")]
     [SerializeField] private Transform gridContainer;
     [SerializeField] private UICellBehavior cellPrefab;
 
-    private Difficulty currentDifficulty = Difficulty.Easy;
+    private Difficulty currentDifficulty = Difficulty.Easy; // Default
     private GameMode currentMode = GameMode.PvP;
 
 	private void OnEnable()
@@ -49,15 +62,62 @@ public class UIBehavior : MonoBehaviour
 	{
 		restartButton.onClick.AddListener(RestartGame);
         
-        easyButton.onClick.AddListener(()=> StartGame(Difficulty.Easy));
-        mediumButton.onClick.AddListener(()=> StartGame(Difficulty.Medium));
-        hardButton.onClick.AddListener(()=> StartGame(Difficulty.Hard));
+        playPvPButton.onClick.AddListener(()=> StartGame(GameMode.PvP));
+        playPvEButton.onClick.AddListener(()=> StartGame(GameMode.PvE));
+        
+        difficultySlider.onValueChanged.AddListener(OnDifficultyChanged);
+
+        // Initialize Defaults
+        difficultySlider.value = 0; // Easy
+        OnDifficultyChanged(0);
 
         // Show difficulty panel first
         difficultyPanel.SetActive(true);
         gameEndPanel.SetActive(false);
-        if(turnIndicatorText) turnIndicatorText.text = ""; // Hide initially
+        if(turnIndicatorText) turnIndicatorText.text = ""; 
 	}
+
+    private void OnDifficultyChanged(float value)
+    {
+        // 0 = Easy, 1 = Medium, 2 = Hard
+        int intVal = Mathf.RoundToInt(value);
+        switch(intVal)
+        {
+            case 0:
+                currentDifficulty = Difficulty.Easy;
+                difficultyText.text = "EASY";
+                difficultyText.color = easyColor;
+                sliderFillImage.color = easyColor;
+                pveButtonImage.color = easyColor;
+                sliderHandleImage.color = easyColor;
+                smileyIcon.sprite = easyIcon;
+                smileyIconRectTransform.sizeDelta = new Vector2(200, smileyIconRectTransform.sizeDelta.y);
+                gameDescriptionText.text = "Red is cross, blue is circle!\r\nGet three in a row to win!";
+				break;
+            case 1:
+                currentDifficulty = Difficulty.Medium;
+                difficultyText.text = "MEDIUM";
+                difficultyText.color = mediumColor;
+                sliderFillImage.color = mediumColor;
+                pveButtonImage.color = mediumColor;
+                sliderHandleImage.color = mediumColor;
+                smileyIcon.sprite = mediumIcon;
+				smileyIconRectTransform.sizeDelta = new Vector2(200, smileyIconRectTransform.sizeDelta.y);
+				gameDescriptionText.text = "Red is cross, blue is circle!\r\nGet four in a row to win!";
+				break;
+            case 2:
+                currentDifficulty = Difficulty.Hard;
+                difficultyText.text = "HARD";
+                difficultyText.color = hardColor;
+                sliderFillImage.color = hardColor;
+                pveButtonImage.color = hardColor;
+                sliderHandleImage.color = hardColor;
+                smileyIcon.sprite = hardIcon;
+				smileyIconRectTransform.sizeDelta = new Vector2(300, smileyIconRectTransform.sizeDelta.y);
+				gameDescriptionText.text = "Red is cross, blue is circle!\r\nGet five in a row to win!";
+				break;
+        }
+    }
 
     private void UpdateTurnText(bool isXTurn)
     {
@@ -71,13 +131,12 @@ public class UIBehavior : MonoBehaviour
             turnIndicatorText.text = isXTurn ? "Player X Turn" : "Player O Turn";
     }
 
-    private void StartGame(Difficulty difficulty)
+    private void StartGame(GameMode mode)
     {
-        currentDifficulty = difficulty;
-        currentMode = aiModeToggle.isOn ? GameMode.PvE : GameMode.PvP;
+        currentMode = mode;
         
         difficultyPanel.SetActive(false);
-        BoardManager.Instance.InitializeGame(difficulty, currentMode);
+        BoardManager.Instance.InitializeGame(currentDifficulty, currentMode);
     }
 
     private void GenerateGrid(int gridSize, System.Collections.Generic.List<Cell> cells)
