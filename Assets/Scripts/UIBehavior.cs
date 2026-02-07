@@ -7,6 +7,7 @@ public class UIBehavior : MonoBehaviour
 	[SerializeField] private TextMeshProUGUI gameStatusText;
     [SerializeField] private TextMeshProUGUI turnIndicatorText;
 	[SerializeField] private Button restartButton;
+    [SerializeField] private Button backButton;
 	[SerializeField] private GameObject gameEndPanel;
     [SerializeField] private TextMeshProUGUI gameDescriptionText;
     [SerializeField] private Image sliderFillImage;
@@ -17,6 +18,12 @@ public class UIBehavior : MonoBehaviour
     [SerializeField] private Sprite easyIcon;
     [SerializeField] private Sprite mediumIcon;
     [SerializeField] private Sprite hardIcon;
+    [SerializeField] private Image gameScreenBgImage;
+    [SerializeField] private TMP_Text gameScreenDifficultyText;
+    [SerializeField] private TMP_Text gameScreenYourScoreText;
+    [SerializeField] private TMP_Text gameScreenBotScoreText;
+    [SerializeField] private Animator yourTurnAnimator;
+    [SerializeField] private Animator botTurnAnimator;
     
     [Header("Difficulty Selection")]
     [SerializeField] private GameObject difficultyPanel;
@@ -26,6 +33,8 @@ public class UIBehavior : MonoBehaviour
 	[SerializeField] private Color easyColor;
 	[SerializeField] private Color mediumColor;
 	[SerializeField] private Color hardColor;
+    [SerializeField] private Color xTurnColor;
+    [SerializeField] private Color oTurnColor;
 	[SerializeField] private Button playPvPButton;
     [SerializeField] private Button playPvEButton;
 
@@ -44,7 +53,7 @@ public class UIBehavior : MonoBehaviour
         
         // Listen to Turn Changes for UI Feedback
         if (TurnManager.Instance != null)
-             TurnManager.Instance.OnTurnChanged += UpdateTurnText;
+             TurnManager.Instance.OnTurnChanged += UpdateTurnInfo;
 	}
 	private void OnDisable()
 	{
@@ -56,10 +65,11 @@ public class UIBehavior : MonoBehaviour
 		}
 
         if (TurnManager.Instance != null)
-             TurnManager.Instance.OnTurnChanged -= UpdateTurnText;
+             TurnManager.Instance.OnTurnChanged -= UpdateTurnInfo;
 	}
 	private void Start()
 	{
+        backButton.onClick.AddListener(GoToDifficultyPanel);
 		restartButton.onClick.AddListener(RestartGame);
         
         playPvPButton.onClick.AddListener(()=> StartGame(GameMode.PvP));
@@ -87,6 +97,7 @@ public class UIBehavior : MonoBehaviour
                 currentDifficulty = Difficulty.Easy;
                 difficultyText.text = "EASY";
                 difficultyText.color = easyColor;
+                gameScreenDifficultyText.text = "EASY";
                 sliderFillImage.color = easyColor;
                 pveButtonImage.color = easyColor;
                 sliderHandleImage.color = easyColor;
@@ -98,7 +109,8 @@ public class UIBehavior : MonoBehaviour
                 currentDifficulty = Difficulty.Medium;
                 difficultyText.text = "MEDIUM";
                 difficultyText.color = mediumColor;
-                sliderFillImage.color = mediumColor;
+				gameScreenDifficultyText.text = "MEDIUM";
+				sliderFillImage.color = mediumColor;
                 pveButtonImage.color = mediumColor;
                 sliderHandleImage.color = mediumColor;
                 smileyIcon.sprite = mediumIcon;
@@ -109,7 +121,8 @@ public class UIBehavior : MonoBehaviour
                 currentDifficulty = Difficulty.Hard;
                 difficultyText.text = "HARD";
                 difficultyText.color = hardColor;
-                sliderFillImage.color = hardColor;
+				gameScreenDifficultyText.text = "HARD";
+				sliderFillImage.color = hardColor;
                 pveButtonImage.color = hardColor;
                 sliderHandleImage.color = hardColor;
                 smileyIcon.sprite = hardIcon;
@@ -119,7 +132,7 @@ public class UIBehavior : MonoBehaviour
         }
     }
 
-    private void UpdateTurnText(bool isXTurn)
+    private void UpdateTurnInfo(bool isXTurn)
     {
         if (difficultyPanel.activeSelf || gameEndPanel.activeSelf) 
         {
@@ -127,8 +140,20 @@ public class UIBehavior : MonoBehaviour
             return;
         }
 
-        if (turnIndicatorText) 
-            turnIndicatorText.text = isXTurn ? "Player X Turn" : "Player O Turn";
+        //if (turnIndicatorText) 
+        //    turnIndicatorText.text = isXTurn ? "Player X Turn" : "Player O Turn";
+
+        gameScreenBgImage.color = isXTurn ? xTurnColor : oTurnColor;
+
+        if (isXTurn)
+        {
+            yourTurnAnimator.SetTrigger("Play Popup");
+        }
+        else if (!isXTurn && BoardManager.Instance.currentMode == GameMode.PvE)
+        {
+            botTurnAnimator.SetTrigger("Play Popup");
+        }
+
     }
 
     private void StartGame(GameMode mode)
@@ -167,12 +192,20 @@ public class UIBehavior : MonoBehaviour
 	{
 		if (isWin)
 		{
-			string winner = value == 1 ? "X" : "O";
-			gameStatusText.text = $"{winner} Player Wins!";
+			//string winner = value == 1 ? "X" : "O";
+			//gameStatusText.text = $"{winner} Player Wins!";
+            if (value == 1)
+            {
+                gameScreenYourScoreText.text = "1";
+            }
+            else
+            {
+                gameScreenBotScoreText.text = "1";
+            }
 		}
 		else
 		{
-			gameStatusText.text = "It's a Draw! Try Again.";
+			//gameStatusText.text = "It's a Draw! Try Again.";
 		}
 		gameEndPanel.SetActive(true);
 	}
@@ -180,9 +213,19 @@ public class UIBehavior : MonoBehaviour
 	{
 		gameStatusText.text = "";
 		gameEndPanel.SetActive(false);
+        gameScreenYourScoreText.text = "0";
+        gameScreenBotScoreText.text = "0";
+
+        TurnManager.Instance.ResetTurn();
         // We stay in game unless we want to go back to difficulty menu?
         // Logic says "ResetGame" usually just restarts current match.
 	}
+
+    private void GoToDifficultyPanel()
+    {
+        difficultyPanel.SetActive(true);
+    }
+
 	private void RestartGame()
 	{
 		BoardManager.Instance.InitializeGame(currentDifficulty, currentMode);

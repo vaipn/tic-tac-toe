@@ -23,7 +23,7 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
 
     private List<Cell> cellsList = new();
     private int currentGridSize;
-    private GameMode currentMode;
+    public GameMode currentMode;
     private bool isGameActive;
 
     private void Start()
@@ -70,7 +70,7 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
     private System.Collections.IEnumerator PerformAIMove()
     {
         // Small delay for UX
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         
         if (!isGameActive) yield break;
 
@@ -85,7 +85,11 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
         {
             var target = emptyCells[UnityEngine.Random.Range(0, emptyCells.Count)];
             target.SetValue(2); // AI is always O
-            TurnManager.Instance.SwitchTurn();
+
+			// Small delay for UX
+			yield return new WaitForSeconds(0.5f);
+
+			TurnManager.Instance.SwitchTurn();
         }
     }
 
