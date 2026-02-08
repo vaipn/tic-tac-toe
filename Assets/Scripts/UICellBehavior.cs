@@ -38,9 +38,9 @@ public class UICellBehavior : MonoBehaviour
 	private Sprite blankImage;
 	private void Awake()
 	{
-		xImage = Resources.Load<Sprite>("x");
-		oImage = Resources.Load<Sprite>("o");
-		blankImage = Resources.Load<Sprite>("cell");
+		xImage = Resources.Load<Sprite>("Core/x");
+		oImage = Resources.Load<Sprite>("Core/o");
+		blankImage = Resources.Load<Sprite>("Core/cell");
 	}
 	private void Start()
 	{
