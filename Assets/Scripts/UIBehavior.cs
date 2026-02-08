@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class UIBehavior : MonoBehaviour
 {
-	[SerializeField] private TextMeshProUGUI gameStatusText;
+	[Header("End Screen")]
 	[SerializeField] private Button pveLoseScreenRestartButton;
     [SerializeField] private Button pveWinScreenRestartButton;
     [SerializeField] private Button pvpEndScreenRestartButton;
@@ -14,15 +14,9 @@ public class UIBehavior : MonoBehaviour
     [SerializeField] private GameObject pveBackButtonObject;
     [SerializeField] private Image pvpGameEndPanelImage;
     [SerializeField] private TMP_Text pvpGameEndPanelText;
-    [SerializeField] private TextMeshProUGUI gameDescriptionText;
-    [SerializeField] private Image sliderFillImage;
-    [SerializeField] private Image pveButtonImage;
-    [SerializeField] private Image sliderHandleImage;
-    [SerializeField] private Image smileyIcon;
-    [SerializeField] private RectTransform smileyIconRectTransform;
-    [SerializeField] private Sprite easyIcon;
-    [SerializeField] private Sprite mediumIcon;
-    [SerializeField] private Sprite hardIcon;
+
+
+    [Header("In-Game Screen")]
     [SerializeField] private Image gameScreenBgImage;
     [SerializeField] private TMP_Text gameScreenDifficultyText;
     [SerializeField] private TMP_Text gameScreenYourScoreText; // pve
@@ -39,7 +33,8 @@ public class UIBehavior : MonoBehaviour
     [SerializeField] private GameObject difficultyPanel;
     [SerializeField] private Slider difficultySlider; 
     [SerializeField] private TextMeshProUGUI difficultyText;
-    [SerializeField] private Color difficultyColor;
+	[SerializeField] private TextMeshProUGUI gameDescriptionText;
+	[SerializeField] private Color difficultyColor;
 	[SerializeField] private Color easyColor;
 	[SerializeField] private Color mediumColor;
 	[SerializeField] private Color hardColor;
@@ -47,8 +42,16 @@ public class UIBehavior : MonoBehaviour
     [SerializeField] private Color oTurnColor;
 	[SerializeField] private Button playPvPButton;
     [SerializeField] private Button playPvEButton;
+	[SerializeField] private Image sliderFillImage;
+	[SerializeField] private Image pveButtonImage;
+	[SerializeField] private Image sliderHandleImage;
+	[SerializeField] private Image smileyIcon;
+	[SerializeField] private RectTransform smileyIconRectTransform;
+	[SerializeField] private Sprite easyIcon;
+	[SerializeField] private Sprite mediumIcon;
+	[SerializeField] private Sprite hardIcon;
 
-    [Header("Grid Generation")]
+	[Header("Grid Generation")]
     [SerializeField] private Transform gridContainer;
     [SerializeField] private UICellBehavior cellPrefab;
 
@@ -268,7 +271,6 @@ public class UIBehavior : MonoBehaviour
 	}
 	private void ResetUI()
 	{
-		gameStatusText.text = "";
         SetGameEndPanelsInactive();
         gameScreenYourScoreText.text = "0";
         gameScreenBotScoreText.text = "0";
