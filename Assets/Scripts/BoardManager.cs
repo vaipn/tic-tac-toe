@@ -76,21 +76,118 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
 
         // Simple Random AI
         var emptyCells = new List<Cell>();
-        foreach(var c in cellsList)
+        Cell targetCell = null;
+
+        // Determine Intelligence based on Difficulty (Grid Size)
+        // Easy (3): 60% chance to be smart
+        // Medium (4): 65% chance
+        // Hard (5): 80% chance
+        float smartChance = 0f;
+        switch(currentGridSize)
         {
-            if (c.value == 0) emptyCells.Add(c);
+            case 3: smartChance = 0.6f; break;
+            case 4: smartChance = 0.7f; break;
+            case 5: smartChance = 0.8f; break;
         }
 
-        if (emptyCells.Count > 0)
+        // Roll dice - should AI be smart this turn?
+        bool beSmart = UnityEngine.Random.value <= smartChance;
+
+        if (beSmart)
         {
-            var target = emptyCells[UnityEngine.Random.Range(0, emptyCells.Count)];
-            target.SetValue(2); // AI is always O
-
-			// Small delay for UX
-			yield return new WaitForSeconds(0.5f);
-
-			TurnManager.Instance.SwitchTurn();
+            // 1. Try to Win (AI = 2)
+            targetCell = FindBestMoveFor(2);
+            
+            // 2. Block Player (Player = 1)
+            if (targetCell == null)
+                targetCell = FindBestMoveFor(1);
         }
+
+        // 3. Pick Center (Best for 3x3)
+        if (targetCell == null && currentGridSize == 3 && beSmart)
+        {
+            Cell center = cellsList[4]; // ID 4 is center of 0-8
+            if (center.value == 0) targetCell = center;
+        }
+
+        // 4. Random (Fallback)
+        if (targetCell == null)
+        {
+            var emptyCells = new List<Cell>();
+            foreach(var c in cellsList)
+            {
+                if (c.value == 0) emptyCells.Add(c);
+            }
+            if (emptyCells.Count > 0)
+                targetCell = emptyCells[UnityEngine.Random.Range(0, emptyCells.Count)];
+        }
+
+        if (targetCell != null)
+        {
+            targetCell.SetValue(2); // AI is always O
+            TurnManager.Instance.SwitchTurn();
+        }
+    }
+
+    private Cell FindBestMoveFor(int playerValue)
+    {
+        int size = currentGridSize;
+        // Check Rows
+        for (int row = 0; row < size; row++)
+        {
+            var cell = CheckLineForMove(row * size, 1, size, playerValue);
+            if (cell != null) return cell;
+        }
+        // Check Columns
+        for (int col = 0; col < size; col++)
+        {
+            var cell = CheckLineForMove(col, size, size, playerValue);
+            if (cell != null) return cell;
+        }
+        // Check Diagonals
+        var diag1 = CheckLineForMove(0, size + 1, size, playerValue);
+        if (diag1 != null) return diag1;
+
+        var diag2 = CheckLineForMove(size - 1, size - 1, size, playerValue);
+        if (diag2 != null) return diag2;
+
+        return null; // No winning/blocking move found
+    }
+
+    private Cell CheckLineForMove(int startIndex, int step, int count, int valueToCheck)
+    {
+        int countMatch = 0;
+        Cell emptyCell = null;
+        int countEmpty = 0;
+
+        for (int i = 0; i < count; i++)
+        {
+            int index = startIndex + (i * step);
+            Cell c = cellsList[index];
+
+            if (c.value == valueToCheck)
+            {
+                countMatch++;
+            }
+            else if (c.value == 0)
+            {
+                emptyCell = c;
+                countEmpty++;
+            }
+            else
+            {
+                // Occluded by other player/AI
+                return null; 
+            }
+        }
+
+        // If we have (Size - 1) marks and 1 empty spot, that's the spot!
+        if (countMatch == count - 1 && countEmpty == 1)
+        {
+            return emptyCell;
+        }
+
+        return null;
     }
 
     private void ClearBoard()
