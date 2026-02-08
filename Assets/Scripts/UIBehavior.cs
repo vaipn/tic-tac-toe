@@ -105,7 +105,14 @@ public class UIBehavior : MonoBehaviour
     private void OnDifficultyChanged(float value)
     {
         // 0 = Easy, 1 = Medium, 2 = Hard
-        int intVal = Mathf.RoundToInt(value);
+        int intVal;
+
+        // normal approximation changes to medium difficulty too fast (this tries to make sure it changes to medium at almost the middle)
+        if (value <= 0.9f && value > 0.48f)
+            intVal = 0;
+        else
+            intVal = Mathf.RoundToInt(value);
+
         switch(intVal)
         {
             case 0:
