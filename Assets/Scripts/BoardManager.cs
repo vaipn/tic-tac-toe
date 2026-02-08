@@ -74,8 +74,6 @@ public class BoardManager : PersistentMonoSingleton<BoardManager>
         
         if (!isGameActive) yield break;
 
-        // Simple Random AI
-        var emptyCells = new List<Cell>();
         Cell targetCell = null;
 
         // Determine Intelligence based on Difficulty (Grid Size)
