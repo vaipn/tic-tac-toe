@@ -58,6 +58,8 @@ public class UIBehavior : MonoBehaviour
     private Difficulty currentDifficulty = Difficulty.Easy; // Default
     private GameMode currentMode = GameMode.PvP;
 
+    private bool gameFinished;
+
 	private void OnEnable()
 	{
 		BoardManager.Instance.OnGameFinished += HandleGameFinished;
@@ -147,7 +149,7 @@ public class UIBehavior : MonoBehaviour
 
     private void UpdateTurnInfo(bool isXTurn)
     {
-        if (difficultyPanel.activeSelf || pveGameLosePanel.activeSelf || pveGameWinPanel.activeSelf || pvpGameEndPanel.activeSelf)
+        if (difficultyPanel.activeSelf || pveGameLosePanel.activeSelf || pveGameWinPanel.activeSelf || pvpGameEndPanel.activeSelf || gameFinished)
         {
             // if (turnIndicatorText) turnIndicatorText.text = "";
             return;
@@ -176,6 +178,8 @@ public class UIBehavior : MonoBehaviour
     private void StartGame(GameMode mode)
     {
         currentMode = mode;
+
+        gameFinished = false;
         
         difficultyPanel.SetActive(false);
 
@@ -264,7 +268,8 @@ public class UIBehavior : MonoBehaviour
 		else
 		{
             // its a draw, restart
-            RestartGame();
+            gameFinished = true;
+            StartCoroutine(RestartGameWithDelay(1f));// if we still have time, we should play disappearing animation instead
 			//gameStatusText.text = "It's a Draw! Try Again.";
 		}
 		
@@ -290,6 +295,7 @@ public class UIBehavior : MonoBehaviour
 
 	private void RestartGame()
 	{
+		gameFinished = false;
 		SetGameEndPanelsInactive();
 		pveBackButtonObject.SetActive(true);
 		BoardManager.Instance.InitializeGame(currentDifficulty, currentMode);
@@ -300,5 +306,11 @@ public class UIBehavior : MonoBehaviour
 		pveGameLosePanel.SetActive(false);
 		pveGameWinPanel.SetActive(false);
         pvpGameEndPanel.SetActive(false);
+	}
+
+	private System.Collections.IEnumerator RestartGameWithDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+		RestartGame();
 	}
 }
