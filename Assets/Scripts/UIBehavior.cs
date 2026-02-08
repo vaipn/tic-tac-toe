@@ -5,7 +5,6 @@ using UnityEngine.UI;
 public class UIBehavior : MonoBehaviour
 {
 	[SerializeField] private TextMeshProUGUI gameStatusText;
-    [SerializeField] private TextMeshProUGUI turnIndicatorText;
 	[SerializeField] private Button pveLoseScreenRestartButton;
     [SerializeField] private Button pveWinScreenRestartButton;
     [SerializeField] private Button pvpEndScreenRestartButton;
@@ -96,7 +95,6 @@ public class UIBehavior : MonoBehaviour
         // Show difficulty panel first
         difficultyPanel.SetActive(true);
         SetGameEndPanelsInactive();
-        if(turnIndicatorText) turnIndicatorText.text = ""; 
 	}
 
     private void OnDifficultyChanged(float value)
