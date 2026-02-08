@@ -1576,6 +1576,7 @@ MonoBehaviour:
   pveGameLosePanel: {fileID: 49617834}
   pveGameWinPanel: {fileID: 1741872077}
   pvpGameEndPanel: {fileID: 671791799}
+  pveBackButtonObject: {fileID: 1659998323}
   pvpGameEndPanelImage: {fileID: 671791801}
   pvpGameEndPanelText: {fileID: 649486091}
   gameDescriptionText: {fileID: 715383011}

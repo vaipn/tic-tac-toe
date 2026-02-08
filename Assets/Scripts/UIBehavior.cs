@@ -12,6 +12,7 @@ public class UIBehavior : MonoBehaviour
 	[SerializeField] private GameObject pveGameLosePanel;
     [SerializeField] private GameObject pveGameWinPanel;
     [SerializeField] private GameObject pvpGameEndPanel;
+    [SerializeField] private GameObject pveBackButtonObject;
     [SerializeField] private Image pvpGameEndPanelImage;
     [SerializeField] private TMP_Text pvpGameEndPanelText;
     [SerializeField] private TextMeshProUGUI gameDescriptionText;
@@ -177,7 +178,9 @@ public class UIBehavior : MonoBehaviour
         
         difficultyPanel.SetActive(false);
 
-        if (currentMode == GameMode.PvE)
+		pveBackButtonObject.SetActive(true);
+
+		if (currentMode == GameMode.PvE)
         {
             pveStaticUIContainer.SetActive(true);
             pvpStaticUIContainer.SetActive(false);
@@ -254,6 +257,8 @@ public class UIBehavior : MonoBehaviour
 					pvpGameEndPanel.SetActive(true);
 				}
 			}
+
+            pveBackButtonObject.SetActive(false);
 		}
 		else
 		{
@@ -286,6 +291,7 @@ public class UIBehavior : MonoBehaviour
 	private void RestartGame()
 	{
 		SetGameEndPanelsInactive();
+		pveBackButtonObject.SetActive(true);
 		BoardManager.Instance.InitializeGame(currentDifficulty, currentMode);
 	}
 
