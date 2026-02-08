@@ -1566,7 +1566,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f48b356a7524774cab9cfdc9fad6b62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameStatusText: {fileID: 0}
   pveLoseScreenRestartButton: {fileID: 2071520526}
   pveWinScreenRestartButton: {fileID: 716948453}
   pvpEndScreenRestartButton: {fileID: 1928305581}
@@ -1576,15 +1575,6 @@ MonoBehaviour:
   pveBackButtonObject: {fileID: 1659998323}
   pvpGameEndPanelImage: {fileID: 671791801}
   pvpGameEndPanelText: {fileID: 649486091}
-  gameDescriptionText: {fileID: 715383011}
-  sliderFillImage: {fileID: 488832901}
-  pveButtonImage: {fileID: 870503928}
-  sliderHandleImage: {fileID: 2098963749}
-  smileyIcon: {fileID: 1330528988}
-  smileyIconRectTransform: {fileID: 1330528987}
-  easyIcon: {fileID: 21300000, guid: 378ad291a5188cf4bac8e3a6d71624e9, type: 3}
-  mediumIcon: {fileID: 21300000, guid: 90a17f7a2f045a940ac3982833ac76f7, type: 3}
-  hardIcon: {fileID: 21300000, guid: 33b4956c911547241aa7b78f037719ac, type: 3}
   gameScreenBgImage: {fileID: 1792659350}
   gameScreenDifficultyText: {fileID: 1210698403}
   gameScreenYourScoreText: {fileID: 868862647}
@@ -1599,6 +1589,7 @@ MonoBehaviour:
   difficultyPanel: {fileID: 262022319}
   difficultySlider: {fileID: 401525489}
   difficultyText: {fileID: 1010531764}
+  gameDescriptionText: {fileID: 715383011}
   difficultyColor: {r: 0, g: 0, b: 0, a: 0}
   easyColor: {r: 0.14901961, g: 0.5568628, b: 0.20784314, a: 1}
   mediumColor: {r: 0.76862746, g: 0.5137255, b: 0.003921569, a: 1}
@@ -1607,6 +1598,14 @@ MonoBehaviour:
   oTurnColor: {r: 0.2627451, g: 0.46666667, b: 0.56078434, a: 1}
   playPvPButton: {fileID: 776387999}
   playPvEButton: {fileID: 870503927}
+  sliderFillImage: {fileID: 488832901}
+  pveButtonImage: {fileID: 870503928}
+  sliderHandleImage: {fileID: 2098963749}
+  smileyIcon: {fileID: 1330528988}
+  smileyIconRectTransform: {fileID: 1330528987}
+  easyIcon: {fileID: 21300000, guid: 378ad291a5188cf4bac8e3a6d71624e9, type: 3}
+  mediumIcon: {fileID: 21300000, guid: 90a17f7a2f045a940ac3982833ac76f7, type: 3}
+  hardIcon: {fileID: 21300000, guid: 33b4956c911547241aa7b78f037719ac, type: 3}
   gridContainer: {fileID: 524572133}
   cellPrefab: {fileID: 4650639064676751237, guid: e6380359ecd8603489d8fa17de2b51f7, type: 3}
 --- !u!1 &253426035
@@ -7641,7 +7640,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 56.95
+  m_fontSize: 56.85
   m_fontSizeBase: 50
   m_fontWeight: 400
   m_enableAutoSizing: 1
