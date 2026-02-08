@@ -216,10 +216,10 @@ public class UIBehavior : MonoBehaviour
         }
 
         // Setup Grid Layout
-        var gridLayout = gridContainer.GetComponent<UnityEngine.UI.GridLayoutGroup>();
+        var gridLayout = gridContainer.GetComponent<GridLayoutGroup>();
         if(gridLayout != null)
         {
-            gridLayout.constraint = UnityEngine.UI.GridLayoutGroup.Constraint.FixedColumnCount;
+            gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             gridLayout.constraintCount = gridSize;
         }
 
