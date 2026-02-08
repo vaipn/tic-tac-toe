@@ -133,7 +133,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 487a4b49be2909c4c924ead9d106ed75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cell: {fileID: 11400000, guid: 27562255e51924c42b41c7da51ca5a1d, type: 2}
   button: {fileID: 1240329204257750584}
   image: {fileID: 7401106541252684069}
   defaultColor: {r: 1, g: 1, b: 1, a: 1}

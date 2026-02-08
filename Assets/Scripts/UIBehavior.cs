@@ -6,8 +6,14 @@ public class UIBehavior : MonoBehaviour
 {
 	[SerializeField] private TextMeshProUGUI gameStatusText;
     [SerializeField] private TextMeshProUGUI turnIndicatorText;
-	[SerializeField] private Button restartButton;
-	[SerializeField] private GameObject gameEndPanel;
+	[SerializeField] private Button pveLoseScreenRestartButton;
+    [SerializeField] private Button pveWinScreenRestartButton;
+    [SerializeField] private Button pvpEndScreenRestartButton;
+	[SerializeField] private GameObject pveGameLosePanel;
+    [SerializeField] private GameObject pveGameWinPanel;
+    [SerializeField] private GameObject pvpGameEndPanel;
+    [SerializeField] private Image pvpGameEndPanelImage;
+    [SerializeField] private TMP_Text pvpGameEndPanelText;
     [SerializeField] private TextMeshProUGUI gameDescriptionText;
     [SerializeField] private Image sliderFillImage;
     [SerializeField] private Image pveButtonImage;
@@ -26,8 +32,8 @@ public class UIBehavior : MonoBehaviour
     [SerializeField] private Animator yourTurnAnimator;
     [SerializeField] private Animator oTurnAnimator;
     [SerializeField] private Animator botTurnAnimator;
-    [SerializeField] private GameObject topContainer; // pve
-    [SerializeField] private GameObject middleContainer; // pvp
+    [SerializeField] private GameObject pveStaticUIContainer;
+    [SerializeField] private GameObject pvpStaticUIContainer;
     
     [Header("Difficulty Selection")]
     [SerializeField] private GameObject difficultyPanel;
@@ -73,9 +79,11 @@ public class UIBehavior : MonoBehaviour
 	}
 	private void Start()
 	{
-		restartButton.onClick.AddListener(RestartGame);
-        
-        playPvPButton.onClick.AddListener(()=> StartGame(GameMode.PvP));
+		pveLoseScreenRestartButton.onClick.AddListener(RestartGame);
+		pveWinScreenRestartButton.onClick.AddListener(RestartGame);
+		pvpEndScreenRestartButton.onClick.AddListener(RestartGame);
+
+		playPvPButton.onClick.AddListener(()=> StartGame(GameMode.PvP));
         playPvEButton.onClick.AddListener(()=> StartGame(GameMode.PvE));
         
         difficultySlider.onValueChanged.AddListener(OnDifficultyChanged);
@@ -86,7 +94,7 @@ public class UIBehavior : MonoBehaviour
 
         // Show difficulty panel first
         difficultyPanel.SetActive(true);
-        gameEndPanel.SetActive(false);
+        SetGameEndPanelsInactive();
         if(turnIndicatorText) turnIndicatorText.text = ""; 
 	}
 
@@ -137,9 +145,9 @@ public class UIBehavior : MonoBehaviour
 
     private void UpdateTurnInfo(bool isXTurn)
     {
-        if (difficultyPanel.activeSelf || gameEndPanel.activeSelf) 
+        if (difficultyPanel.activeSelf || pveGameLosePanel.activeSelf || pveGameWinPanel.activeSelf || pvpGameEndPanel.activeSelf)
         {
-            if (turnIndicatorText) turnIndicatorText.text = "";
+            // if (turnIndicatorText) turnIndicatorText.text = "";
             return;
         }
 
@@ -171,13 +179,13 @@ public class UIBehavior : MonoBehaviour
 
         if (currentMode == GameMode.PvE)
         {
-            topContainer.SetActive(true);
-            middleContainer.SetActive(false);
+            pveStaticUIContainer.SetActive(true);
+            pvpStaticUIContainer.SetActive(false);
         }
         else if (currentMode == GameMode.PvP)
         {
-            middleContainer.SetActive(true);
-            topContainer.SetActive(false);
+            pvpStaticUIContainer.SetActive(true);
+            pveStaticUIContainer.SetActive(false);
         }
 
         BoardManager.Instance.InitializeGame(currentDifficulty, currentMode);
@@ -218,23 +226,47 @@ public class UIBehavior : MonoBehaviour
             {
                 gameScreenYourScoreText.text = "1";
                 gameScreenXScoreText.text = "1";
+
+                if (currentMode == GameMode.PvE)
+                {
+                    pveGameWinPanel.SetActive(true);
+                }
+                else
+                {
+                    pvpGameEndPanelImage.color = new Color(xTurnColor.r, xTurnColor.g, xTurnColor.b, pvpGameEndPanelImage.color.a);
+                    pvpGameEndPanelText.text = "RED \r\nWINS!";
+					pvpGameEndPanel.SetActive(true);
+                }
             }
             else
             {
                 gameScreenBotScoreText.text = "1";
 				gameScreenOScoreText.text = "1";
+
+				if (currentMode == GameMode.PvE)
+				{
+					pveGameLosePanel.SetActive(true);
+				}
+				else
+				{
+					pvpGameEndPanelImage.color = new Color(oTurnColor.r, oTurnColor.g, oTurnColor.b, pvpGameEndPanelImage.color.a);
+					pvpGameEndPanelText.text = "BLUE \r\nWINS!";
+					pvpGameEndPanel.SetActive(true);
+				}
 			}
 		}
 		else
 		{
+            // its a draw, restart
+            RestartGame();
 			//gameStatusText.text = "It's a Draw! Try Again.";
 		}
-		gameEndPanel.SetActive(true);
+		
 	}
 	private void ResetUI()
 	{
 		gameStatusText.text = "";
-		gameEndPanel.SetActive(false);
+        SetGameEndPanelsInactive();
         gameScreenYourScoreText.text = "0";
         gameScreenBotScoreText.text = "0";
 		gameScreenXScoreText.text = "0";
@@ -248,10 +280,19 @@ public class UIBehavior : MonoBehaviour
     public void GoToDifficultyPanel()
     {
         difficultyPanel.SetActive(true);
+        SetGameEndPanelsInactive();
     }
 
 	private void RestartGame()
 	{
+		SetGameEndPanelsInactive();
 		BoardManager.Instance.InitializeGame(currentDifficulty, currentMode);
+	}
+
+	private void SetGameEndPanelsInactive()
+	{
+		pveGameLosePanel.SetActive(false);
+		pveGameWinPanel.SetActive(false);
+        pvpGameEndPanel.SetActive(false);
 	}
 }
